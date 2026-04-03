@@ -1,11 +1,114 @@
 import streamlit as st
 import pandas as pd
 import joblib
+import matplotlib.pyplot as plt
+
+
+
+feature_names = {
+    "Тип предприятия": "Тип предприятия",
+    "Количество хостов": "Количество хостов",
+    "Код реализованной угрозы": "Код угрозы",
+    "Регион размещения предприятия": "Регион",
+    "month": "Месяц",
+    "weekday": "День недели",
+    "hour": "Час",
+    "is_weekend": "Выходной",
+    "season": "Сезон",
+    "Успех": "Успешная атака",
+    "Нарушение конфиденциальности": "Нарушена конфиденциальность",
+    "Нарушение целостности": "Нарушена целостность"
+}
+
+
 
 # === загрузка модели ===
 
 model = joblib.load("model.pkl")
 columns = joblib.load("columns.pkl")
+
+
+
+uploaded_file = st.file_uploader(
+    "Загрузите Excel файл",
+    type=["xlsx"]
+)
+
+if uploaded_file:
+
+    df = pd.read_excel(uploaded_file)
+
+    preds = model.predict(df)
+
+    df["Prediction"] = preds
+
+    st.write(df.head())
+
+# st.write("Колонки модели:")
+# st.write(columns)
+# === загрузка Excel ===
+
+
+if uploaded_file is not None:
+
+    df = pd.read_excel(uploaded_file)
+
+    st.write("Загруженные данные:")
+    st.write(df.head())
+
+    # предсказания
+    preds = model.predict(df)
+
+    df["Prediction"] = preds
+
+    st.write("Результаты:")
+    st.write(df.head())
+
+    # кнопка скачивания
+    st.download_button(
+        label="Скачать результат",
+        data=df.to_csv(index=False).encode(),
+        file_name="predictions.csv",
+        mime="text/csv"
+    )
+    
+
+
+
+st.header("Важность признаков")
+
+importances = model.feature_importances_
+
+
+feat_df = pd.DataFrame({
+    "feature": columns,
+    "importance": importances
+})
+
+feat_df["feature"] = feat_df["feature"].map(
+    lambda x: feature_names.get(x, x)
+)
+
+# сортировка
+feat_df = feat_df.sort_values(
+    by="importance",
+    ascending=True
+)
+
+# построение графика
+fig, ax = plt.subplots()
+
+ax.barh(
+    feat_df["feature"],
+    feat_df["importance"]
+)
+
+ax.set_xlabel("Важность")
+ax.set_title("Диаграмма важности признаков")
+
+st.pyplot(fig)
+
+
 
 st.title("Предсказание нарушения доступности")
 
@@ -27,6 +130,13 @@ hosts = st.number_input(
     min_value=1,
     max_value=10000,
     value=100
+)
+
+threat_code = st.number_input(
+    "Код реализованной угрозы",
+    min_value=0,
+    max_value=300,
+    value=1
 )
 
 region = st.number_input(
@@ -92,37 +202,47 @@ is_weekend = st.number_input(
     value=0
 )
 
+
+
+
 # === кнопка ===
+
+inputs = {}
+
+
+for col in columns:
+    
+    label = feature_names.get(col, col)
+
+    inputs[col] = st.number_input(
+    label,
+    value=0
+)
 
 if st.button("Предсказать"):
 
+
     data = pd.DataFrame(
-        [[
-            enterprise_type,
-            hosts,
-            region,
-            success,
-            month,
-            weekday,
-            hour,
-            is_weekend,
-            season,
-            conf,
-            integrity
-        ]],
-        columns=columns
-    )
+    [inputs],
+    columns=columns
+)
 
     prediction = model.predict(data)[0]
     probability = model.predict_proba(data)[0][1]
 
     if prediction == 1:
         st.error(
-            f"Есть риск нарушения доступности\n"
+            f"Есть риск нарушения доступности.\n"
             f"Вероятность: {probability:.2f}"
         )
     else:
         st.success(
-            f"Риск низкий\n"
+            f"Риск низкий.\n"
             f"Вероятность: {probability:.2f}"
         )
+
+
+
+
+
+# python -m streamlit run app.py
