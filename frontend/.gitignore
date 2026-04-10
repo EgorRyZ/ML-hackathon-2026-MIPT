@@ -69,3 +69,5 @@ vite.config.ts.timestamp-*
 *.tsbuildinfo
 
 node_modules/
+
+*svg
