@@ -1,37 +1,24 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import { DashboardPage } from "../pages/DashboardPage";
-import { PredictionPage } from "../pages/PredictionPage";
-import { VulnerabilityPage } from "../pages/VulnerabilityPage";
-import { RecommendationsPage } from "../pages/RecommendationsPage";
-import { ThreatCatalogPage } from "../pages/ThreatCatalogPage";
+import { Navbar } from "../components/Navbar";
+import DashboardPage from "../pages/DashboardPage";
+import PredictionPage from "../pages/PredictionPage";
 
 export const AppRouter = () => {
   return (
     <BrowserRouter>
 
+      <Navbar />
+
       <Routes>
 
-        <Route path="/" element={<DashboardPage />} />
+        <Route
+          path="/"
+          element={<DashboardPage />}
+        />
 
         <Route
           path="/prediction"
           element={<PredictionPage />}
-        />
-
-        <Route
-          path="/vulnerability"
-          element={<VulnerabilityPage />}
-        />
-
-        <Route
-          path="/recommendations"
-          element={<RecommendationsPage />}
-        />
-
-        <Route
-          path="/threats"
-          element={<ThreatCatalogPage />}
         />
 
       </Routes>

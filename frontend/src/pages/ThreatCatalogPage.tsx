@@ -1,31 +1,17 @@
-import { Link } from "react-router-dom";
-
 export const ThreatCatalogPage = () => {
   return (
-    <div>
-
-      <nav style={{ marginBottom: "20px" }}>
-        <Link to="/">Dashboard | </Link>
-
-        <Link to="/prediction">
-          Prediction |
-        </Link>
-
-        <Link to="/vulnerability">
-          Vulnerability |
-        </Link>
-
-        <Link to="/recommendations">
-          Recommendations |
-        </Link>
-
-        <Link to="/threats">
-          Threat Catalog
-        </Link>
-      </nav>
-
+    <div style={{ padding: 20 }}>
       <h1>Threat Catalog</h1>
 
+      <p>
+        Здесь будет список всех угроз.
+      </p>
+
+      <ul>
+        <li>Угроза 1</li>
+        <li>Угроза 2</li>
+        <li>Угроза 3</li>
+      </ul>
     </div>
   );
 };
